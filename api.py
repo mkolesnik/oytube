@@ -1,12 +1,12 @@
 import flask
+import server
 
 from flask import abort
 from flask import jsonify
 from flask import request
 
 app = flask.Flask(__name__)
-tasks = {}
-task_id = 1
+server = server.Server()
 
 @app.route('/')
 def home():
@@ -14,32 +14,32 @@ def home():
 
 @app.route('/following/')
 def following():
-    return tasks
+    return server.following_all()
 
 @app.route('/following/<int:task_id>')
 def get_following(task_id):
-    if task_id not in tasks:
+    if not server.is_following(task_id):
         abort(404)
 
-    return jsonify(tasks[task_id])
+    return jsonify(server.following(task_id))
 
 @app.route('/following/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
-    if task_id not in tasks:
+    if not server.is_following(task_id):
         abort(404)
     
-    del tasks[task_id]
+    server.unfollow(task_id)
     return '', 204
 
 @app.route('/following', methods=['POST'])
 def follow():
-    if not request.json:
+    task = request.json
+    if not task:
         abort(400)
 
-    global task_id
-    tasks[task_id] = request.json
-    task_id = task_id + 1
+    task_id = server.follow(task)
 
-    return request.json, 201
+    return jsonify({task_id: task}), 201
 
+server.start()
 app.run()
