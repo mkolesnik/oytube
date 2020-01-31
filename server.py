@@ -1,3 +1,5 @@
+import json
+import hashlib
 import time
 import subprocess
 import sys
@@ -8,8 +10,18 @@ class Server(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.running = False
-        self.tasks = {}
-        self.task_id = 1
+        self.tasks = self._load_tasks()
+
+    def _save_tasks(self):
+        with open('tasks.json', 'w') as outfile:
+            json.dump(self.tasks, outfile)
+
+    def _load_tasks(self):
+        try:
+            with open('tasks.json') as json_file:
+                return json.load(json_file)
+        except FileNotFoundError:
+            return {}
 
     def run(self):
         self.running = True
@@ -59,11 +71,16 @@ class Server(Thread):
     def following(self, task_id):
         return self.tasks[task_id]
 
+    def _task_id(self, task):
+        url = task['url'].encode("UTF-8")
+        return hashlib.md5(url).hexdigest()[:10]
+
     def follow(self, task):
-        task_id = self.task_id
+        task_id = self._task_id(task)
         self.tasks[task_id] = task
-        self.task_id = self.task_id + 1
+        self._save_tasks()
         return task_id
 
     def unfollow(self, task_id):
         del self.tasks[task_id]
+        self._save_tasks()

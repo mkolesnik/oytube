@@ -16,14 +16,14 @@ def home():
 def following():
     return server.following_all()
 
-@app.route('/following/<int:task_id>')
+@app.route('/following/<task_id>')
 def get_following(task_id):
     if not server.is_following(task_id):
         abort(404)
 
     return jsonify(server.following(task_id))
 
-@app.route('/following/<int:task_id>', methods=['DELETE'])
+@app.route('/following/<task_id>', methods=['DELETE'])
 def delete_task(task_id):
     if not server.is_following(task_id):
         abort(404)
