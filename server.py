@@ -33,6 +33,7 @@ class Server(Thread):
 
     def _process_next_task(self):
         if not self.tasks:
+            print("No tasks to process.. :(")
             time.sleep(10)
             return
         
@@ -46,7 +47,7 @@ class Server(Thread):
     
     def _run_download(self, task_id):
         task = self.tasks[task_id]
-        youtubedl_cmd = ['./youtube-dl',
+        youtubedl_cmd = ['youtube-dl',
             '--config-location', '.youtube-dl.config',
             '--download-archive', 'youtube-dl.%s.archive' % task_id]
         if 'args' in task:

@@ -42,4 +42,4 @@ def follow():
     return jsonify({task_id: task}), 201
 
 server.start()
-app.run()
+app.run(host='0.0.0.0', port=9029)
