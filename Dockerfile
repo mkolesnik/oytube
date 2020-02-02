@@ -2,9 +2,7 @@ FROM python:3-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache ffmpeg && \
-  wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl && \
-  chmod a+rx /usr/local/bin/youtube-dl
+RUN apk add --no-cache ffmpeg
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt

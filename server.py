@@ -1,8 +1,8 @@
 import json
 import hashlib
 import time
-import subprocess
 import sys
+import ytdl
 
 from threading import Thread
 
@@ -39,30 +39,12 @@ class Server(Thread):
         
         for task_id in self.tasks:
             try:
-                self._run_download(task_id)
+                ytdl.download(task_id, self.tasks[task_id])
             except:
                 print("Error while running:", sys.exc_info())
 
         time.sleep(1000)
     
-    def _run_download(self, task_id):
-        task = self.tasks[task_id]
-        youtubedl_cmd = ['youtube-dl',
-            '--config-location', '.youtube-dl.config',
-            '--download-archive', 'youtube-dl.%s.archive' % task_id]
-        if 'args' in task:
-            youtubedl_cmd.extend(task['args'])
-
-        youtubedl_cmd.append(task['url'])
-        out = subprocess.Popen(youtubedl_cmd, 
-           stdout=subprocess.PIPE, 
-           stderr=subprocess.STDOUT)
-        
-        stdout, stderr = out.communicate()
-        task['returncode'] = out.returncode
-        task['stderr'] = str(stderr)
-        task['stdout'] = str(stdout)
-
     def is_following(self, task_id):
         return task_id in self.tasks
 
