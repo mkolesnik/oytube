@@ -1,5 +1,6 @@
 import json
 import hashlib
+import os
 import time
 import sys
 import ytdl
@@ -10,15 +11,19 @@ class Server(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.running = False
+        self._tasks_file = os.path.join(
+            os.getenv('BUSTUBE_CONFIG_DIR', '.'),
+            'tasks.json'
+        )
         self.tasks = self._load_tasks()
 
     def _save_tasks(self):
-        with open('tasks.json', 'w') as outfile:
+        with open(self._tasks_file, 'w') as outfile:
             json.dump(self.tasks, outfile)
 
     def _load_tasks(self):
         try:
-            with open('tasks.json') as json_file:
+            with open(self._tasks_file) as json_file:
                 return json.load(json_file)
         except FileNotFoundError:
             return {}
