@@ -1,3 +1,4 @@
+import copy
 import json
 import hashlib
 import os
@@ -18,8 +19,14 @@ class Server(Thread):
         self.tasks = self._load_tasks()
 
     def _save_tasks(self):
+        tasks = copy.deepcopy(self.tasks)
+        for v in tasks.values():
+            if 'debug' in v:
+                del v['debug']
+                del v['warnings']
+                del v['errors']
         with open(self._tasks_file, 'w') as outfile:
-            json.dump(self.tasks, outfile)
+            json.dump(tasks, outfile)
 
     def _load_tasks(self):
         try:
@@ -48,6 +55,7 @@ class Server(Thread):
             except:
                 print("Error while running:", sys.exc_info())
 
+        self._save_tasks()
         time.sleep(1000)
     
     def is_following(self, task_id):

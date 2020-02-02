@@ -1,3 +1,4 @@
+import datetime
 import os
 import youtube_dl
 
@@ -59,6 +60,7 @@ def download(task_id, task):
             os.getenv('BUSTUBE_CONFIG_DIR', '.'),
             'youtube-dl.%s.archive' % task_id
         ),
+        'daterange': youtube_dl.utils.DateRange(start=task.get('last_run')),
         'logger': TaskLogger(task),
     })
     ydl_opts.update(task.get('opts', {}))
@@ -69,6 +71,7 @@ def download(task_id, task):
         os.makedirs(dl_dir, exist_ok=True)
         os.chdir(dl_dir)
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            task['last_run'] = datetime.date.today().strftime('%Y%m%d')
             task['return_code'] = ydl.download([task['url']])
     finally:
         os.chdir(orig_dir)
