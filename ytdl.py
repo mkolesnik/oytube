@@ -1,3 +1,4 @@
+import os
 import youtube_dl
 
 GLOBAL_OPTS = {
@@ -6,6 +7,8 @@ GLOBAL_OPTS = {
     "cachedir": False,
     "noprogress": True,
     "call_home": False,
+    "writeinfojson": True,
+    "outtmpl": '%(title)s.%(ext)s',
 }
 
 class TaskLogger(object):
@@ -28,13 +31,44 @@ def get_info(url):
     with youtube_dl.YoutubeDL() as ydl:
         return ydl.extract_info(url, process=False)
 
+def get_inner_directory(task):
+    if 'dir' in task:
+        return task['dir']
+
+    info = get_info(task['url'])
+    extractor = info['extractor_key']
+    if extractor == 'YoutubeChannel':
+        info = get_info(info['url'])
+        return info['uploader']
+
+    if extractor == 'YoutubePlaylist':
+        return info['title']
+
+    return 'misc_videos'
+
+def get_directory(task):
+    return os.path.join(
+        os.getenv('BUSTUBE_DOWNLOAD_DIR', '.'),
+        get_inner_directory(task)
+    )
+
 def download(task_id, task):
     ydl_opts = dict(GLOBAL_OPTS)
     ydl_opts.update({
-        'download_archive': 'youtube-dl.%s.archive' % task_id,
+        'download_archive': os.path.join(
+            os.getenv('BUSTUBE_CONFIG_DIR', '.'),
+            'youtube-dl.%s.archive' % task_id
+        ),
         'logger': TaskLogger(task),
     })
     ydl_opts.update(task.get('opts', {}))
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        task['return_code'] = ydl.download([task['url']])
+    orig_dir = os.getcwd()
+    try:
+        dl_dir = get_directory(task)
+        os.makedirs(dl_dir, exist_ok=True)
+        os.chdir(dl_dir)
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            task['return_code'] = ydl.download([task['url']])
+    finally:
+        os.chdir(orig_dir)
