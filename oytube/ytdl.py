@@ -30,16 +30,24 @@ class TaskLogger(object):
     def error(self, msg):
         self.task['errors'].append(msg)
 
-def get_info(url):
-    with youtube_dl.YoutubeDL() as ydl:
-        return ydl.extract_info(url, process=False)
+def get_info(task):
+    if not task.get('_info'):
+        with youtube_dl.YoutubeDL() as ydl:
+            info = ydl.extract_info(task['url'], process=False)
+            if 'formats' in info:
+                del info['formats']
+            if 'entries' in info:
+                del info['entries']
+            task['_info'] = {k: v for k, v in info.items() if v}
+
+    return task['_info']
 
 def get_inner_directory(task):
     d = task.get('dir')
     if d:
         return d
 
-    info = get_info(task['url'])
+    info = get_info(task)
     extractor = info['extractor_key']
 
     if extractor == 'YoutubePlaylist':
@@ -51,13 +59,16 @@ def get_inner_directory(task):
     return info['uploader']
 
 def get_directory(task):
-    base_dir = task.get('base_dir')
-    if not base_dir:
-        base_dir = os.getenv('OYTUBE_DOWNLOAD_DIR', '.')
-    return os.path.join(
-        base_dir,
-        get_inner_directory(task)
-    )
+    directory = task.get('_dir')
+    if not directory:
+        base_dir = task.get('base_dir')
+        if not base_dir:
+            base_dir = os.getenv('OYTUBE_DOWNLOAD_DIR', '.')
+
+        directory = os.path.join(base_dir, get_inner_directory(task))
+        task['_dir'] = directory
+
+    return directory
 
 def download(task_id, task):
     logger = TaskLogger(task)

@@ -21,16 +21,25 @@ def following(logs):
         task = tasks[task_id]
         click.echo('* Task %s' % task_id)
         click.echo('  + URL: %s' % task['url'])
+        _print_if_persent(task, '  + Title: %s', '_info', 'title')
         if 'last_checked' in task:
             click.echo('  + Last checked: {:%d/%m/%Y %H:%M}'.format(
                 datetime.fromtimestamp(task['last_checked'])))
         else:
             click.echo('  + Last checked: Never')
         click.echo('  + Successful: %s' % (task.get('return_code', -1) == 0))
-        if task.get('base_dir'):
-            click.echo('  + Base directory: %s' % task['base_dir'])
+        _print_if_persent(task, '  + Base directory: %s', 'base_dir')
         if logs:
             _print_all_logs(task)
+
+def _print_if_persent(task, text, *keys):
+    d = task
+    for key in keys:
+        d = d.get(key)
+        if not d:
+            return
+
+    click.echo(text % d)
 
 @click.command(help='Follow the given URL')
 @click.option('--base_dir', default=None,

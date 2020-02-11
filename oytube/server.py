@@ -29,6 +29,10 @@ class Server(Thread):
                 del v['debug']
                 del v['warnings']
                 del v['errors']
+            keys = list(v.keys())
+            for key in keys:
+                if key.startswith('_'):
+                    del v[key]
         with open(self._tasks_file, 'w') as outfile:
             json.dump(tasks, outfile)
 
@@ -55,6 +59,7 @@ class Server(Thread):
         
         for task_id, task in self.tasks.items():
             try:
+                ytdl.get_info(task)
                 last_checked = task.get('last_checked', EPOCH)
                 check_min = datetime.now().timestamp() - timedelta(hours=3).total_seconds()
                 if last_checked > check_min:
