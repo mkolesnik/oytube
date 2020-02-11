@@ -70,16 +70,19 @@ def get_directory(task):
 
     return directory
 
+def archive_file(task_id):
+    return os.path.join(
+        os.getenv('OYTUBE_CONFIG_DIR', '.'),
+        'youtube-dl.%s.archive' % task_id
+    )
+
 def download(task_id, task):
     logger = TaskLogger(task)
     task['last_checked'] = datetime.now().timestamp()
 
     ydl_opts = dict(GLOBAL_OPTS)
     ydl_opts.update({
-        'download_archive': os.path.join(
-            os.getenv('OYTUBE_CONFIG_DIR', '.'),
-            'youtube-dl.%s.archive' % task_id
-        ),
+        'download_archive': archive_file(task_id),
         'daterange': youtube_dl.utils.DateRange(start=task.get('last_run')),
         'logger': logger,
     })

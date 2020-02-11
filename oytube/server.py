@@ -95,4 +95,5 @@ class Server(Thread):
 
     def unfollow(self, task_id):
         del self.tasks[task_id]
+        os.remove(ytdl.archive_file(task_id))
         self._save_tasks()
