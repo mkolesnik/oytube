@@ -35,19 +35,20 @@ def get_info(url):
         return ydl.extract_info(url, process=False)
 
 def get_inner_directory(task):
-    if 'dir' in task:
-        return task['dir']
+    d = task.get('dir')
+    if d:
+        return d
 
     info = get_info(task['url'])
     extractor = info['extractor_key']
-    if extractor == 'YoutubeChannel':
-        info = get_info(info['url'])
-        return info['uploader']
 
     if extractor == 'YoutubePlaylist':
         return info['title']
 
-    return 'misc_videos'
+    if extractor == 'YoutubeChannel':
+        info = get_info(info['url'])
+
+    return info['uploader']
 
 def get_directory(task):
     base_dir = task.get('base_dir')

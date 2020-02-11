@@ -35,9 +35,11 @@ def following(logs):
 @click.command(help='Follow the given URL')
 @click.option('--base_dir', default=None,
     help='base directory to save the files, default is $OYTUBE_DOWNLOAD_DIR')
+@click.option('-d', '--dir', 'directory', default=None,
+    help='directory to save the files (under the base directory), default is the channel/playlist name')
 @click.argument('url')
-def follow(base_dir, url):
-    req = {'url': url, 'base_dir': base_dir}
+def follow(base_dir, directory, url):
+    req = {'url': url, 'base_dir': base_dir, 'dir': directory}
     resp = requests.post(URL, json=req)
 
     resp.raise_for_status()
