@@ -6,7 +6,10 @@ import time
 import sys
 import ytdl
 
+from datetime import datetime
 from threading import Thread
+
+EPOCH = datetime.fromtimestamp(0).timestamp()
 
 class Server(Thread):
     def __init__(self):
@@ -51,6 +54,11 @@ class Server(Thread):
         
         for task_id in self.tasks:
             try:
+                last_checked = task.get('last_checked', EPOCH)
+                if last_checked > now - timedelta(hours=3).total_seconds():
+                    print('[OYTube] Already checked %s recently, skipping' % task_id)
+                    continue
+
                 ytdl.download(task_id, self.tasks[task_id])
             except:
                 print("Error while running:", sys.exc_info())

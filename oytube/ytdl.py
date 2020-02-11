@@ -14,7 +14,6 @@ GLOBAL_OPTS = {
     "writeinfojson": True,
     "outtmpl": '%(title)s.%(ext)s',
 }
-EPOCH = datetime.fromtimestamp(0).timestamp()
 
 class TaskLogger(object):
     def __init__(self, task):
@@ -60,10 +59,6 @@ def get_directory(task):
 def download(task_id, task):
     logger = TaskLogger(task)
     now = datetime.now().timestamp()
-    last_checked = task.get('last_checked', EPOCH)
-    if last_checked > now - timedelta(hours=3).total_seconds():
-        logger.debug('[OYTube] Already checked recently, skipping')
-        return
     task['last_checked'] = now
 
     ydl_opts = dict(GLOBAL_OPTS)
