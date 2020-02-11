@@ -56,8 +56,8 @@ def logs(task_url):
         _print_logs(task, log_type)
 
 def _print_logs(task, log_type):
+    click.echo('* %s logs:' % log_type.capitalize())
     for line in task[log_type]:
-        click.echo('* %s logs:' % log_type.capitalize())
         click.echo('  + %s' % line)
 
 def _get_task_id(task_url):
