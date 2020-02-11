@@ -39,22 +39,38 @@ def follow(url):
 @click.command(help='Stop following the given task identified by ID/URL')
 @click.argument('task_url')
 def unfollow(task_url):
-    orig_task_url = task_url
-    tasks = _all_tasks()
-    if task_url not in tasks:
-        for task_id in tasks:
-            if tasks[task_id]['url'] == task_url:
-                task_url = task_id
-                break
-        raise click.ClickException('No such task ID/URL %s' % task_url)
-
-    resp = requests.delete('/'.join((URL, task_url)))
+    task_id, _ = _get_task_id(task_url)
+    resp = requests.delete('/'.join((URL, task_id)))
     resp.raise_for_status()
-    click.echo('Succesfully unfollowed %s' % orig_task_url)
+    click.echo('Succesfully unfollowed %s' % task_url)
+
+@click.command(help='Get the logs for the given task identified by ID/URL')
+@click.argument('task_url')
+def logs(task_url):
+    _, task = _get_task_id(task_url)
+    for log_type in ('debug', 'warnings', 'errors'):
+        _print_logs(task, log_type)
+
+def _print_logs(task, log_type):
+    for line in task[log_type]:
+        click.echo('* %s logs:' % log_type.capitalize())
+        click.echo('  + %s' % line)
+
+def _get_task_id(task_url):
+    tasks = _all_tasks()
+    if task_url in tasks:
+        return task_url, tasks[task_url]
+
+    for task_id in tasks:
+        if tasks[task_id]['url'] == task_url:
+            return task_id, tasks[task_id]
+
+    raise click.ClickException('No such task ID/URL %s' % task_url)
 
 cli.add_command(following)
 cli.add_command(follow)
 cli.add_command(unfollow)
+cli.add_command(logs)
 
 if __name__ == '__main__':
     cli()
