@@ -13,7 +13,9 @@ def _all_tasks():
     return requests.get(URL).json()
 
 @click.command(help='Get a list of followed URLs')
-def following():
+@click.option('-l', '--logs', is_flag=True, default=False,
+    help='print the logs for each task')
+def following(logs):
     tasks = _all_tasks()
     for task_id in tasks:
         task = tasks[task_id]
@@ -27,6 +29,8 @@ def following():
         click.echo('  + Successful: %s' % (task.get('return_code', -1) == 0))
         if task.get('base_dir'):
             click.echo('  + Base directory: %s' % task['base_dir'])
+        if logs:
+            _print_all_logs(task)
 
 @click.command(help='Follow the given URL')
 @click.option('--base_dir', default=None,
@@ -52,13 +56,18 @@ def unfollow(task_url):
 @click.argument('task_url')
 def logs(task_url):
     _, task = _get_task_id(task_url)
+    click.echo('* Task %s' % task_url)
+    _print_all_logs(task)
+
+def _print_all_logs(task):
     for log_type in ('debug', 'warnings', 'errors'):
-        _print_logs(task, log_type)
+        if task.get(log_type):
+            _print_logs(task, log_type)
 
 def _print_logs(task, log_type):
-    click.echo('* %s logs:' % log_type.capitalize())
+    click.echo('  @ %s logs:' % log_type.capitalize())
     for line in task[log_type]:
-        click.echo('  + %s' % line)
+        click.echo('    - %s' % line)
 
 def _get_task_id(task_url):
     tasks = _all_tasks()
