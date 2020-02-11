@@ -3,10 +3,11 @@ import json
 import hashlib
 import os
 import time
-import sys
+import traceback
 import ytdl
 
 from datetime import datetime
+from datetime import timedelta
 from threading import Thread
 
 EPOCH = datetime.fromtimestamp(0).timestamp()
@@ -52,16 +53,18 @@ class Server(Thread):
             time.sleep(10)
             return
         
-        for task_id in self.tasks:
+        for task_id, task in self.tasks.items():
             try:
                 last_checked = task.get('last_checked', EPOCH)
-                if last_checked > now - timedelta(hours=3).total_seconds():
+                check_min = datetime.now().timestamp() - timedelta(hours=3).total_seconds()
+                if last_checked > check_min:
                     print('[OYTube] Already checked %s recently, skipping' % task_id)
                     continue
 
-                ytdl.download(task_id, self.tasks[task_id])
+                ytdl.download(task_id, task)
             except:
-                print("Error while running:", sys.exc_info())
+                print("Error while running:")
+                traceback.print_exc()
 
         self._save_tasks()
         time.sleep(1000)

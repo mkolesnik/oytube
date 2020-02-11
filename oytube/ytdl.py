@@ -3,7 +3,6 @@ import youtube_dl
 
 from datetime import date
 from datetime import datetime
-from datetime import timedelta
 
 GLOBAL_OPTS = {
     "ignoreerrors": True,
@@ -51,8 +50,9 @@ def get_inner_directory(task):
     return 'misc_videos'
 
 def get_directory(task):
-    default_dir = os.getenv('OYTUBE_DOWNLOAD_DIR', '.')
-    base_dir = task.get('base_dir', default_dir)
+    base_dir = task.get('base_dir')
+    if not base_dir:
+        base_dir = os.getenv('OYTUBE_DOWNLOAD_DIR', '.')
     return os.path.join(
         base_dir,
         get_inner_directory(task)
@@ -60,8 +60,7 @@ def get_directory(task):
 
 def download(task_id, task):
     logger = TaskLogger(task)
-    now = datetime.now().timestamp()
-    task['last_checked'] = now
+    task['last_checked'] = datetime.now().timestamp()
 
     ydl_opts = dict(GLOBAL_OPTS)
     ydl_opts.update({
