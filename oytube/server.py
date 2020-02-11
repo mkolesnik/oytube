@@ -16,7 +16,7 @@ class Server(Thread):
         Thread.__init__(self)
         self.running = False
         self._tasks_file = os.path.join(
-            os.getenv('BUSTUBE_CONFIG_DIR', '.'),
+            os.getenv('OYTUBE_CONFIG_DIR', '.'),
             'tasks.json'
         )
         self.tasks = self._load_tasks()

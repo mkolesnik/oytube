@@ -10,7 +10,7 @@ server = server.Server()
 
 @app.route('/')
 def home():
-    return "BUSTube"
+    return "OYTube"
 
 @app.route('/following/')
 def following():

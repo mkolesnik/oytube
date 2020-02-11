@@ -30,7 +30,7 @@ def following():
 
 @click.command(help='Follow the given URL')
 @click.option('--base_dir', default=None,
-    help='base directory to save the files, default is $BUSTUBE_DOWNLOAD_DIR')
+    help='base directory to save the files, default is $OYTUBE_DOWNLOAD_DIR')
 @click.argument('url')
 def follow(base_dir, url):
     req = {'url': url, 'base_dir': base_dir}

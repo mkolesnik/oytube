@@ -6,7 +6,7 @@ RUN apk add --no-cache ffmpeg
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-ENV BUSTUBE_DOWNLOAD_DIR="/download" BUSTUBE_CONFIG_DIR="/config"
+ENV OYTUBE_DOWNLOAD_DIR="/download" OYTUBE_CONFIG_DIR="/config"
 
 COPY oytube/ .
 

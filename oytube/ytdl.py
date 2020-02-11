@@ -51,7 +51,7 @@ def get_inner_directory(task):
     return 'misc_videos'
 
 def get_directory(task):
-    default_dir = os.getenv('BUSTUBE_DOWNLOAD_DIR', '.')
+    default_dir = os.getenv('OYTUBE_DOWNLOAD_DIR', '.')
     base_dir = task.get('base_dir', default_dir)
     return os.path.join(
         base_dir,
@@ -66,7 +66,7 @@ def download(task_id, task):
     ydl_opts = dict(GLOBAL_OPTS)
     ydl_opts.update({
         'download_archive': os.path.join(
-            os.getenv('BUSTUBE_CONFIG_DIR', '.'),
+            os.getenv('OYTUBE_CONFIG_DIR', '.'),
             'youtube-dl.%s.archive' % task_id
         ),
         'daterange': youtube_dl.utils.DateRange(start=task.get('last_run')),
