@@ -51,8 +51,10 @@ def get_inner_directory(task):
     return 'misc_videos'
 
 def get_directory(task):
+    default_dir = os.getenv('BUSTUBE_DOWNLOAD_DIR', '.')
+    base_dir = task.get('base_dir', default_dir)
     return os.path.join(
-        os.getenv('BUSTUBE_DOWNLOAD_DIR', '.'),
+        base_dir,
         get_inner_directory(task)
     )
 

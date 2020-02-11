@@ -25,11 +25,15 @@ def following():
         else:
             click.echo('  + Last checked: Never')
         click.echo('  + Successful: %s' % (task.get('return_code', -1) == 0))
+        if task.get('base_dir'):
+            click.echo('  + Base directory: %s' % task['base_dir'])
 
 @click.command(help='Follow the given URL')
+@click.option('--base_dir', default=None,
+    help='base directory to save the files, default is $BUSTUBE_DOWNLOAD_DIR')
 @click.argument('url')
-def follow(url):
-    req = {'url': url}
+def follow(base_dir, url):
+    req = {'url': url, 'base_dir': base_dir}
     resp = requests.post(URL, json=req)
 
     resp.raise_for_status()
