@@ -29,6 +29,7 @@ def following(logs):
             click.echo('  + Last checked: Never')
         click.echo('  + Successful: %s' % (task.get('return_code', -1) == 0))
         _print_if_persent(task, '  + Base directory: %s', 'base_dir')
+        _print_if_persent(task, '  + Directory: %s', 'dir')
         if logs:
             _print_all_logs(task)
 
