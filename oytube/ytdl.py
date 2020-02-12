@@ -50,7 +50,7 @@ def get_inner_directory(task):
     info = get_info(task)
     extractor = info['extractor_key']
 
-    if extractor == 'YoutubePlaylist':
+    if extractor in ('YoutubePlaylist', 'SoundcloudUser'):
         return info['title']
 
     if extractor == 'YoutubeChannel':
