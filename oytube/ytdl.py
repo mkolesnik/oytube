@@ -5,7 +5,6 @@ from datetime import date
 from datetime import datetime
 
 GLOBAL_OPTS = {
-    "ignoreerrors": True,
     "no_color": True,
     "cachedir": False,
     "noprogress": True,
@@ -94,7 +93,8 @@ def download(task_id, task):
         os.makedirs(dl_dir, exist_ok=True)
         os.chdir(dl_dir)
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            task['last_run'] = date.today().strftime('%Y%m%d')
             task['return_code'] = ydl.download([task['url']])
+            if task['return_code'] == 0:
+                task['last_run'] = date.today().strftime('%Y%m%d')
     finally:
         os.chdir(orig_dir)
