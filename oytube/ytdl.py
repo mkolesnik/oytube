@@ -31,7 +31,7 @@ class TaskLogger(object):
 
 def get_info(task):
     if not task.get('_info'):
-        with youtube_dl.YoutubeDL() as ydl:
+        with youtube_dl.YoutubeDL(GLOBAL_OPTS) as ydl:
             info = ydl.extract_info(task['url'], process=False)
             if 'formats' in info:
                 del info['formats']

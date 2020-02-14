@@ -45,6 +45,7 @@ class Server(threading.Thread):
 
     def run(self):
         self.running = True
+        self.task_event.set()
         while self.running:
             self._process_next_task()
 
